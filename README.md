@@ -2,6 +2,12 @@
 
 [⚠️⚠️ WORK IN PROGRESS ⚠️⚠️]
 
+## Development Roadmap:
+- [x] Create base AWS infra + deployment, which will deploy api server upon manual ECR image pushes
+- [ ] Build and deploy Go api server for dobsond.dev, which will contain the API endpoints for Momo chatbot feature
+- [ ] Update frontend to hit and handle API calls to these new, separate api endpoints (instead of using Next.js internal API ecosystem)
+- [ ] Hook up AWS Code+ to this repo's `main` branch, so that each push to main triggers a fresh Build + Deploy. (Aka automate CI/CD instead of manual image pushes)
+- [ ] Find something else interesting to learn through this project - whether it be for Go or Terraform/IaC!
 ---
 
 # Go + AWS Portfolio API
@@ -10,14 +16,9 @@
 
 This project contains a Go-based API designed to serve as a backend for `https://www.dobsond.dev`, my personal portfolio website. The infrastructure is fully defined and managed as code (IaC) using Terraform, and it is deployed on Amazon Web Services (AWS) using a modern, containerized architecture with ECS Fargate.
 
-The infrastructure is built to be , secure, and maintainable, with automated TLS/SSL certificate management and a clear, future path for autoamated continuous deployment. 
+**Note to anyone who is interested in using this project:** Given how it is built, it is very easy to clone then make this project your own! Once you swap out some config values to point to your own AWS account, it will automatically spin up and manage a fairly lightweight, cheap AWS infrastructure which can easily run/deploy a api/backend server.
 
-Development Roadmap:
-- [x] Create base AWS infra + deployment, which will deploy api server upon manual ECR image pushes
-- [ ] Build and deploy Go api server for dobsond.dev, which will contain the API endpoints for Momo chatbot feature
-- [ ] Update frontend to hit and handle API calls to these new, separate api endpoints (instead of using Next.js internal API ecosystem)
-- [ ] Hook up AWS Code+ to this repo's `main` branch, so that each push to main triggers a fresh Build + Deploy. (Aka automate CI/CD instead of manual image pushes)
-- [ ] Find something else interesting to learn through this project - whether it be for Go or Terraform/IaC!
+The infrastructure is built to be , secure, and maintainable, with automated TLS/SSL certificate management and a clear, future path for autoamated continuous deployment. 
 
 ## Technology Stack
 
