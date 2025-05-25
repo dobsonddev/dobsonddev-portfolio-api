@@ -14,10 +14,10 @@ The infrastructure is built to be , secure, and maintainable, with automated TLS
 
 Development Roadmap:
 - [x] Create base AWS infra + deployment, which will deploy api server upon manual ECR image pushes
-- [] Build and deploy Go api server for dobsond.dev, which will contain the API endpoints for Momo chatbot feature
-- [] Update frontend to hit and handle API calls to these new, separate api endpoints (instead of using Next.js internal API ecosystem)
-- [] Hook up AWS Code+ to this repo's `main` branch, so that each push to main triggers a fresh Build + Deploy. (Aka automate CI/CD instead of manual image pushes)
-- [] Find something else interesting to learn through this project - whether it be for Go or Terraform/IaC!
+- [ ] Build and deploy Go api server for dobsond.dev, which will contain the API endpoints for Momo chatbot feature
+- [ ] Update frontend to hit and handle API calls to these new, separate api endpoints (instead of using Next.js internal API ecosystem)
+- [ ] Hook up AWS Code+ to this repo's `main` branch, so that each push to main triggers a fresh Build + Deploy. (Aka automate CI/CD instead of manual image pushes)
+- [ ] Find something else interesting to learn through this project - whether it be for Go or Terraform/IaC!
 
 ## Technology Stack
 
