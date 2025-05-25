@@ -10,8 +10,8 @@
 - [ ] **API Development**: Complete Go server endpoints  
 - [ ] **Frontend Integration**: Update [my Next.js dobsonddev-portfolio](https://github.com/dobsonddev/dobsonddev-portfolio) project to hit this api for Momo AI Chatbot feature, instead of using internal API ecosystem
 - [ ] **CI/CD**: Automated deployments on git push
-- [ ] **Monitoring**: CloudWatch logs and metrics
-- [ ] **Testing**: Unit and integration tests
+- [ ] **Monitoring**: Implement ELK Stack (Elasticsearch, Logstash, Kibana) (always wanted to learn/build something with these tools)
+- [ ] **Testing**: Unit, load, and integration tests (probably K6 + Playright) (always wanted to learn/build something with these tools)
 
 ## Biiiiig note - I know this infra is waaaayyyy overkill for just running a very basic api server. I plan to refactor this infra from ALB + ECS Fargate to simply Lambda + API Gateway - this will be 80-90% cheaper (ALB is billed by the hour, ~$18/mo regardless of use). Plan to refactor into this much more fitting infra soon, just wanted to get it off the ground with something working first.
 
