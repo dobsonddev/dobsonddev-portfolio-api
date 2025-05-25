@@ -1,6 +1,6 @@
 # Go Portfolio API
 
-> A modern, containerized Go API backend for portfolio websites, deployed on AWS with Infrastructure as Code.
+> A modern, containerized Go API backend for portfolio websites, running in and deployed from AWS, using Terraform (Infrastructure as Code).
 
 [![Work in Progress](https://img.shields.io/badge/status-work%20in%20progress-yellow)](https://github.com/yourusername/dobsonddev-portfolio-api)
 ## 🔄 Development Roadmap
