@@ -1,123 +1,198 @@
-# dobsonddev-portfolio-api
+# Go Portfolio API
 
-[⚠️⚠️ WORK IN PROGRESS ⚠️⚠️]
+> A modern, containerized Go API backend for portfolio websites, deployed on AWS with Infrastructure as Code.
 
-## Development Roadmap:
-- [x] Create base AWS infra + deployment, which will deploy api server upon manual ECR image pushes
-- [ ] Build and deploy Go api server for dobsond.dev, which will contain the API endpoints for Momo chatbot feature
-- [ ] Update frontend to hit and handle API calls to these new, separate api endpoints (instead of using Next.js internal API ecosystem)
-- [ ] Hook up AWS Code+ to this repo's `main` branch, so that each push to main triggers a fresh Build + Deploy. (Aka automate CI/CD instead of manual image pushes)
-- [ ] Find something else interesting to learn through this project - whether it be for Go or Terraform/IaC!
+[![Work in Progress](https://img.shields.io/badge/status-work%20in%20progress-yellow)](https://github.com/yourusername/dobsonddev-portfolio-api)
+## 🔄 Development Roadmap
+
+- [x] **Infrastructure**: AWS setup with Terraform
+- [ ] **Deployment**: Manual ECR image pushes
+- [ ] **API Development**: Complete Go server endpoints  
+- [ ] **Frontend Integration**: Update [my Next.js dobsonddev-portfolio](https://github.com/dobsonddev/dobsonddev-portfolio) project to hit this api for Momo AI Chatbot feature, instead of using internal API ecosystem
+- [ ] **CI/CD**: Automated deployments on git push
+- [ ] **Monitoring**: CloudWatch logs and metrics
+- [ ] **Testing**: Unit and integration tests
+
+## Biiiiig note - I know this infra is waaaayyyy overkill for just running a very basic api server. I plan to refactor this infra from ALB + ECS Fargate to simply Lambda + API Gateway - this will be 80-90% cheaper (ALB is billed by the hour, ~$18/mo regardless of use). Plan to refactor into this much more fitting infra soon, just wanted to get it off the ground with something working first.
+
+## 🚀 Quick Start
+
+This project deploys a Go API to AWS using Terraform. Perfect for portfolio backends, chatbots, or any lightweight API service.
+
+### What You Get
+- **Scalable**: ECS Fargate + Application Load Balancer
+- **Secure**: HTTPS with auto-managed SSL certificates  
+- **Cost-effective**: ~$15-25/month for light usage
+- **Production-ready**: VPC, private subnets, proper IAM roles
+
+## 📋 Prerequisites
+
+```bash
+# Required tools
+go install
+docker --version
+terraform --version
+aws configure list
+```
+
+## 🏗️ Architecture
+
+```
+Internet → ALB (HTTPS) → ECS Fargate → Go API
+                ↓
+         ACM Certificate + Route53/Vercel DNS
+```
+
+**AWS Services Used:**
+- ECS Fargate (container orchestration)
+- ALB (load balancing + SSL termination)
+- ECR (container registry)
+- VPC (networking)
+- ACM (SSL certificates)
+- SSM Parameter Store (secrets)
+
+## ⚡ Deployment
+
+### 1. Deploy Infrastructure
+
+```bash
+cd terraform
+terraform init
+terraform plan
+terraform apply
+```
+
+### 2. Build & Deploy Application
+
+```bash
+# Build image
+docker build -t portfolio-api .
+
+# Get ECR URL from Terraform
+export ECR_URL=$(terraform -chdir=terraform output -raw ecr_repository_url)
+
+# Login to ECR
+aws ecr get-login-password --region us-east-1 | \
+  docker login --username AWS --password-stdin $ECR_URL
+
+# Push image
+docker tag portfolio-api:latest $ECR_URL:latest
+docker push $ECR_URL:latest
+
+# Deploy to ECS
+terraform apply
+```
+
+### 3. Access Your API
+
+Your API will be available at: `https://api.yourdomain.com`
+
+## 🛠️ Configuration
+
+### Environment Variables
+Set these in `terraform/variables.tf`:
+
+```hcl
+variable "domain_name" {
+  default = "api.yourdomain.com"
+}
+
+variable "aws_region" {
+  default = "us-east-1"
+}
+```
+
+### API Endpoints
+Current endpoints (add yours in `main.go`):
+
+```
+GET  /health           - Health check
+POST /api/chat         - Chatbot endpoint
+GET  /api/projects     - Portfolio projects
+```
+
+## 🔧 Common Commands
+
+```bash
+# View deployed infrastructure
+terraform show
+
+# Check ECS service status
+aws ecs describe-services --cluster portfolio-api --services portfolio-api-service
+
+# View application logs
+aws logs tail /ecs/portfolio-api --follow
+
+# Destroy everything
+terraform destroy
+```
+
+## 💡 Customization
+
+### Using This for Your Own Project
+
+1. **Fork this repository**
+2. **Update configuration**:
+   ```bash
+   # In terraform/variables.tf
+   domain_name = "api.yourdomain.com"
+   
+   # In terraform/ecr.tf  
+   name = "your-project-name"
+   ```
+3. **Follow deployment steps above**
+
+### Adding New API Endpoints
+
+```go
+// In main.go
+func main() {
+    r := gin.Default()
+    
+    // Add your endpoints here
+    r.GET("/api/your-endpoint", yourHandler)
+    
+    r.Run(":8080")
+}
+```
+
+## 🐛 Troubleshooting
+
+**Common Issues:**
+
+- **ECR login fails**: Check AWS credentials and region
+- **SSL certificate pending**: Verify DNS settings in Vercel/Route53
+- **ECS task fails**: Check CloudWatch logs for Go application errors
+- **502 Bad Gateway**: Application might not be listening on port 8080
+
+**Getting Help:**
+```bash
+# Check ECS task logs
+aws logs describe-log-groups --log-group-name-prefix="/ecs/portfolio-api"
+
+# Verify load balancer health
+aws elbv2 describe-target-health --target-group-arn <your-target-group-arn>
+```
+
+## 📈 Cost Optimization
+
+Expected monthly costs (us-east-1):
+- ALB: ~$16
+- ECS Fargate (0.25 vCPU, 0.5GB): ~$3-8  
+- ECR storage: ~$1
+- **Total: $20-25/month**
+
+## 🤝 Contributing
+
+1. Fork the project
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
+
+## 📄 License
+
+MIT License - feel free to use this for your own projects!
+
 ---
 
-# Go + AWS Portfolio API
-
-## Project Overview
-
-This project contains a Go-based API designed to serve as a backend for `https://www.dobsond.dev`, my personal portfolio website. The infrastructure is fully defined and managed as code (IaC) using Terraform, and it is deployed on Amazon Web Services (AWS) using a modern, containerized architecture with ECS Fargate.
-
-**Note to anyone who is interested in using this project:** Given how it is built, it is very easy to clone then make this project your own! Once you swap out some config values to point to your own AWS account, it will automatically spin up and manage a fairly lightweight, cheap AWS infrastructure which can easily run/deploy a api/backend server.
-
-The infrastructure is built to be , secure, and maintainable, with automated TLS/SSL certificate management and a clear, future path for autoamated continuous deployment. 
-
-## Technology Stack
-
-* **Application:** Go
-* **Containerization:** Docker
-* **Cloud Provider:** Amazon Web Services (AWS)
-* **Infrastructure as Code:** Terraform
-* **CI/CD & DNS:** Vercel (for DNS management)
-
-### AWS Infrastructure Components
-
-* **Networking:** Custom VPC with public and private subnets across two availability zones.
-* **Container Orchestration:** Elastic Container Service (ECS) with AWS Fargate for serverless container execution.
-* **Load Balancing:** Application Load Balancer (ALB) to distribute traffic and handle TLS termination.
-* **Container Registry:** Elastic Container Registry (ECR) to store the application's Docker images.
-* **Security:** IAM Roles for granular permissions, Security Groups for network firewalling, and AWS Certificate Manager (ACM) for SSL certificates.
-* **Configuration Management:** AWS Systems Manager (SSM) Parameter Store for securely storing secrets like API keys.
-
-## Prerequisites
-
-Before you begin, ensure you have the following tools installed and configured:
-
-* [Go](https://go.dev/doc/install) (for application development)
-* [Docker](https://docs.docker.com/get-docker/) (for containerizing the application)
-* [Terraform](https://developer.hashicorp.com/terraform/downloads) (for managing the cloud infrastructure in which this api server will run)
-* [AWS CLI](https://aws.amazon.com/cli/) (configured with credentials for your AWS account)
-
-## Setup and Deployment
-
-The process is divided into two main phases: provisioning the cloud infrastructure and deploying the application.
-
-### Phase 1: Provisioning the AWS Infrastructure
-
-These steps create the entire AWS foundation for the API to run on.
-
-1.  **Navigate to the Terraform Directory:**
-    ```bash
-    cd terraform
-    ```
-
-2.  **Initialize Terraform:**
-    This downloads the necessary providers (AWS, Vercel, etc.).
-    ```bash
-    terraform init
-    ```
-
-3.  **Plan the Infrastructure:**
-    This shows you what resources Terraform will create, change, or destroy.
-    ```bash
-    terraform plan
-    ```
-
-4.  **Apply the Infrastructure:**
-    This builds all the AWS resources defined in the `.tf` files. You will be prompted to confirm.
-    ```bash
-    terraform apply
-    ```
-    *Note: The first time you apply, you may need to follow a two-step process to validate the ACM SSL certificate with your Vercel DNS if you haven't automated it with a Vercel provider.*
-
-### Phase 2: Deploying the Go Application
-
-Once the infrastructure is `Applied` successfully, it is ready to host your application.
-
-1.  **Build the Docker Image:**
-    From the root of your project directory, build the Docker image for your Go application.
-    ```bash
-    docker build -t portfolio-api .
-    ```
-
-2.  **Log in to AWS ECR:**
-    Authenticate your Docker client with your private Elastic Container Registry.
-    ```bash
-    aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 203811615434.dkr.ecr.us-east-1.amazonaws.com
-    ```
-
-3.  **Tag and Push the Image to ECR:**
-    Tag your local image to match the ECR repository URI and then push it.
-    ```bash
-    # Get your ECR repository URL from Terraform outputs
-    export ECR_URL=$(terraform -chdir=terraform output -raw ecr_repository_url)
-
-    # Tag the image
-    docker tag portfolio-api:latest $ECR_URL:latest
-
-    # Push the image
-    docker push $ECR_URL:latest
-    ```
-
-4.  **Update the Task Definition:**
-    In your `ecs.tf` file, find the `aws_ecs_task_definition` resource. Update the `image` attribute to use the specific image URI you just pushed (e.g., `"${ECR_URL}:latest"`).
-
-5.  **Apply the Final Change:**
-    Run `terraform apply` one last time. Terraform will detect the change in the task definition and deploy a new version of your container to the ECS service, making your API live.
-    ```bash
-    terraform apply
-    ```
-
-## Accessing the API deployment
-
-Once deployed, the API will be available at your configured domain, secured with SSL:
-
-(e.g. **`https://api.dobsond.dev/`**)
+Built with ❤️ using Go, Terraform, and AWS
